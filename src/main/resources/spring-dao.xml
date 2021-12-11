@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--   关联数据库配置文件-->
+    <context:property-placeholder location="classpath:db.properties"/>
+    <context:component-scan base-package="com.dlb.dao"/>
+    <!--配置数据源-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"  destroy-method="close">
+        <property name="driverClass" value="${driver}"/>
+        <property name="jdbcUrl" value="${url}"/>
+        <property name="user" value="${user}"/>
+        <!--        注意这里不能用username 会Administrator@localhost (using password: YES)-->
+        <property name="password" value="${password}"/>
+        <property name="maxPoolSize" value="40" />      <!--最大连接数-->
+        <property name="minPoolSize" value="1" />       <!--最小连接数-->
+        <property name="initialPoolSize" value="10" />      <!--初始化连接池内的数据库连接-->
+        <property name="maxIdleTime" value="20" />  <!--最大空闲时间-->
+    </bean>
+                                <!--    org.springframework.sqlSessionFactory .mybatis.spring.SqlSessionFactoryBean-->
+    <bean id="sqlSessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <!--指定实体类：注解形式-->
+        <property name="packagesToScan" value="com.dlb.pojo" />
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop> <!--hibernate根据实体自动生成数据库表-->
+                <prop key="hibernate.dialect">${hibernate.dialect}</prop>   <!--指定数据库方言-->
+                <prop key="hibernate.show_sql">${hibernate.show_sql}</prop>     <!--在控制台显示执行的数据库操作语句-->
+                <prop key="hibernate.format_sql">${hibernate.format_sql}</prop>     <!--在控制台显示执行的数据哭操作语句（格式）-->
+            </props>
+        </property>
+    </bean>
+    <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sqlSessionFactory" />
+    </bean>
+
+<!--    &lt;!&ndash;扫描dao包&ndash;&gt;-->
+<!--    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">-->
+<!--        &lt;!&ndash;注入sqlSessionFactory&ndash;&gt;-->
+<!--        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>-->
+<!--        &lt;!&ndash;扫描dao包&ndash;&gt;-->
+<!--        <property name="basePackage" value="com.dlb.mapper"/>-->
+<!--    </bean>-->
+
+</beans>
