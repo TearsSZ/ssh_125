@@ -14,7 +14,7 @@ public class StudentController {
 
     @RequestMapping("/dada")
     public String a(Model model){
-
+       int a;
         return "";
     }
 }
